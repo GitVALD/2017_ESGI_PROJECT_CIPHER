@@ -468,8 +468,6 @@ int decipher(int *matrix[], int matrixID[][4], int rows, int cols, char *filePat
     unsigned char decipherByteInDec = 0;
     // Temporary var for array index
     int tmp = 0;
-    // Byte writing into to new file *.cd
-    unsigned char decipheredByte;
     // FileOutput path
     char decipheredFileName[255] = {'\0'};
 
@@ -542,6 +540,7 @@ int decipher(int *matrix[], int matrixID[][4], int rows, int cols, char *filePat
             }
             k--;
         }
+
         fwrite(&decipherByteInDec,sizeof(unsigned char), 1,fileOutput);
 
     }

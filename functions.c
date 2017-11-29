@@ -511,13 +511,15 @@ int decipher(int *matrix[], int matrixID[][4], int rows, int cols, char *filePat
         for(i = 0; i < 4; i++){
             tmp = colsArray[i];
             decipherBits[i] = bits[tmp];
-            decipherByte[i] = decipherBits[i];
         }
+
+        for(i = 0; i < 4; i++)
+            decipherByte[i] = decipherBits[i];
 
         // Read Second Byte
         fread(&byte, sizeof(unsigned char), 1, fileInput);
 
-        for(i = 7; i >= 0; i++){
+        for(i = 7; i >= 0; i--){
             bits[i] = byte % 2;
             byte /= 2;
         }

@@ -355,8 +355,8 @@ int cypherByMatrix(int *matrix[], int rows, int cols, char *filePath){
             cipherBinary[j] = 0;
         }
         // transform byte(8bit) in array Part 1/2
-        for (int i = 0; i < rows; i++) {
-            bits[i] = byte & (mask << i); // extract ^2 from byte and stock to bits[i] We can get 0 or 1 / 2 / 4 / 8 / 16 / 32 / 64 / 128
+        for (int i = 0; i < 4; i++) {
+            bits[i] = byte & (mask << 7-i); // extract ^2 from byte and stock to bits[i] We can get 0 or 1 / 2 / 4 / 8 / 16 / 32 / 64 / 128
             if(bits[i] != 0) // if we got 1 / 2 / 4 / 8 / 16 / 32 / 64 / 128
                 bits[i] = 1; // we transform it in 1 for a good result. ( Good result is 0101. Bad result is 0208 )
             if (bits[i]) {
@@ -364,6 +364,7 @@ int cypherByMatrix(int *matrix[], int rows, int cols, char *filePath){
                 for (j = 0; j < 8; j++) {
                     cipherBinary[j] = cipherBinary[j] + matrix[k][j];
                 }
+
             }
             // k is the counter (max 4) for the choice of the good line into the matrix
             k++;
@@ -387,7 +388,7 @@ int cypherByMatrix(int *matrix[], int rows, int cols, char *filePath){
         byteCypher = 0; //reset the byte cyphered for the next one
         // transform byte(8bit) in array Part 2/2
         for (int i = 4; i < 8; i++) {
-            bits[i] = byte & (mask << i); // extract ^2 from byte and stock to bits[i] We can get 0 or 1 / 2 / 4 / 8 / 16 / 32 / 64 / 128
+            bits[i] = byte & (mask << 7-i); // extract ^2 from byte and stock to bits[i] We can get 0 or 1 / 2 / 4 / 8 / 16 / 32 / 64 / 128
             if(bits[i] != 0) // if we got 1 / 2 / 4 / 8 / 16 / 32 / 64 / 128
                 bits[i] = 1; // we transform it in 1 for a good result. ( Good result is 0101. Bad result is 0208 )
             if (bits[i]) {
@@ -468,20 +469,15 @@ int decipher(int *matrix[], int matrixID[][4], int rows, int cols, char *filePat
     unsigned char decipherByteInDec = 0;
     // Temporary var for array index
     int tmp = 0;
-    // Byte writing into to new file *.cd
-    unsigned char decipheredByte;
     // FileOutput path
     char decipheredFileName[255] = {'\0'};
-
-
-
     // Array containing cols matching MatrixID;
     int *colsArray = NULL;
-
     // FILE var
     FILE *fileInput;
     FILE *fileOutput;
 
+    // OPEN CIPHERED FILE FOR READING
     fileInput = fopen(filePath, "rb");
 
     if(fileInput == NULL){
@@ -489,6 +485,7 @@ int decipher(int *matrix[], int matrixID[][4], int rows, int cols, char *filePat
         exit(EXIT_FAILURE);
     }
 
+    // OPEN DECIPHERED FILE FOR WRITING
     strcpy(decipheredFileName, strcat(filePath, "d"));
 
     fileOutput = fopen(decipheredFileName, "wb+");
@@ -526,12 +523,14 @@ int decipher(int *matrix[], int matrixID[][4], int rows, int cols, char *filePat
             tmp = colsArray[i];
             decipherBits[i] = bits[tmp];
         }
-
+        j = 0;
         for(i = 4; i < cols; i++){
-            decipherByte[i] = decipherBits[i];
+            decipherByte[i] = decipherBits[j];
+            j++;
         }
 
         k = 7;
+        decipherByteInDec = 0;
         for (j = 0; j < cols; j++) {
             if (decipherByte[j] == 0){  // add the cyphered value to the final byte
                 decipherByteInDec += 0;

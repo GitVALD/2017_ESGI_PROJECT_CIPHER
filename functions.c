@@ -468,6 +468,8 @@ int decipher(int *matrix[], int matrixID[][4], int rows, int cols, char *filePat
     unsigned char decipherByteInDec = 0;
     // Temporary var for array index
     int tmp = 0;
+    // Byte writing into to new file *.cd
+    unsigned char decipheredByte;
     // FileOutput path
     char decipheredFileName[255] = {'\0'};
 
@@ -506,9 +508,12 @@ int decipher(int *matrix[], int matrixID[][4], int rows, int cols, char *filePat
             byte /= 2;
         }
 
-        for(i = 0; i < 8; i++){
-            printf("%d", bits[i]);
+        for(i = 0; i < 4; i++){
+            tmp = colsArray[i];
+            decipherBits[i] = bits[tmp];
+            decipherByte[i] = decipherBits[i];
         }
+
         // Read Second Byte
         fread(&byte, sizeof(unsigned char), 1, fileInput);
 
@@ -517,9 +522,25 @@ int decipher(int *matrix[], int matrixID[][4], int rows, int cols, char *filePat
             byte /= 2;
         }
 
-        for(i = 0; i < 8; i++){
-            printf("%d", bits[i]);
+        for(i = 0; i < rows; i++){
+            tmp = colsArray[i];
+            decipherBits[i] = bits[tmp];
         }
+
+        for(i = 4; i < cols; i++){
+            decipherByte[i] = decipherBits[i];
+        }
+
+        k = 7;
+        for (j = 0; j < cols; j++) {
+            if (decipherByte[j] == 0){  // add the cyphered value to the final byte
+                decipherByteInDec += 0;
+            }else{
+                decipherByteInDec += decipherByte[j] * ((int) pow(2, k));
+            }
+            k--;
+        }
+        fwrite(&decipherByteInDec,sizeof(unsigned char), 1,fileOutput);
 
     }
 
